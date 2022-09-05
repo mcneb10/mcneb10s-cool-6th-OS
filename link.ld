@@ -10,27 +10,32 @@ SECTIONS {
         *(.comment);
     }
     . = 0x7c00;
-    /* Bootloader and code */
-    .text BLOCK(4K) : ALIGN(4K)
+    /* Bootloader */
+    .boot :
 	{
 		*(.bootloader)
+	}
+
+    /* Code */
+    .text :
+	{
 		*(.text)
 	}
 
 	/* Read-only data. */
-	.rodata BLOCK(4K) : ALIGN(4K)
+	.rodata :
 	{
 		*(.rodata)
 	}
 
 	/* Read-write data (initialized) */
-	.data BLOCK(4K) : ALIGN(4K)
+	.data :
 	{
 		*(.data)
 	}
 
 	/* Read-write data (uninitialized) and stack */
-	.bss BLOCK(4K) : ALIGN(4K)
+	.bss :
 	{
 		*(COMMON)
 		*(.bss)

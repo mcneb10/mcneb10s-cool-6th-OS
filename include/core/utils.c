@@ -1,5 +1,5 @@
 #include "utils.h"
-
+#include "mem.h"
 #include <stdint.h>
 
 SCREENENTRY* screen;
@@ -9,14 +9,6 @@ VGACOLOR bgcolor;
 uint16_t screenptr;
 const uint8_t VGA_WIDTH = 80;
 const uint8_t VGA_HEIGHT = 25;
-
-void malloc(uint32_t size) {
-	
-}
-
-void calloc(uint32_t count, uint32_t size) {
-	malloc(count*size);
-}
 
 void clrscreen() {
 	for(uint32_t i=0;i<VGA_WIDTH*VGA_HEIGHT;i++) {
@@ -93,15 +85,16 @@ uint16_t coordtoind(uint16_t x, uint16_t y) {
 
 #define BUFSIZE 100
 
-void printhexu32(uint32_t n) {
+char* atoi(uint32_t n, uint16_t radix) {
 	uint32_t num = n;
 	char buf[BUFSIZE];
+	char* resbuf = malloc(BUFSIZE);
 	uint8_t i=0;
 	if(num == 0) {
 		buf[0] = '0';
 	} else {
 		while(num != 0) {
-			uint8_t dig = num % 16;
+			uint8_t dig = num % radix;
 			char c = '?';
 			if(dig > 9) {
 				c = 'A' + (dig-10);
@@ -109,7 +102,7 @@ void printhexu32(uint32_t n) {
 				c = '0' + dig;
 			}
 			buf[i] = c;
-			num/=16;
+			num/=radix;
 			if(num != 0) i++;
 		}
 	}
@@ -118,75 +111,12 @@ void printhexu32(uint32_t n) {
 			(buf[i] >= '0' && buf[i] <= '9')||
 			(buf[i] >= 'A' && buf[i] <= 'F')
 		) { 
-			putc(buf[i]);
+			resbuf[BUFSIZE - i] = buf[i];
 		}
 		if(i==0) break;
 		i--;
 	}
-}
-
-void printhexu16(uint16_t n) {
-	uint16_t num = n;
-	char buf[BUFSIZE];
-	uint8_t i=0;
-	if(num == 0) {
-		buf[0] = '0';
-	} else {
-		while(num != 0) {
-			uint8_t dig = num % 16;
-			char c = '?';
-			if(dig > 9) {
-				c = 'A' + (dig-10);
-			} else {
-				c = '0' + dig;
-			}
-			buf[i] = c;
-			num/=16;
-			if(num != 0) i++;
-		}
-	}
-	while(1) {
-		if(
-			(buf[i] >= '0' && buf[i] <= '9')||
-			(buf[i] >= 'A' && buf[i] <= 'F')
-		) { 
-			putc(buf[i]);
-		}
-		if(i==0) break;
-		i--;
-	}
-}
-
-void printhexu8(uint8_t n) {
-	uint8_t num = n;
-	char buf[BUFSIZE];
-	uint8_t i=0;
-	if(num == 0) {
-		buf[0] = '0';
-	} else {
-		while(num != 0) {
-			uint8_t dig = num % 16;
-			char c = '?';
-			if(dig > 9) {
-				c = 'A' + (dig-10);
-			} else {
-				c = '0' + dig;
-			}
-			buf[i] = c;
-			num/=16;
-			if(num != 0) i++;
-		}
-	}
-	while(1) {
-		if(
-			(buf[i] >= '0' && buf[i] <= '9')||
-			(buf[i] >= 'A' && buf[i] <= 'F')
-		) { 
-			putc(buf[i]);
-		}
-		if(i==0) break;
-		i--;
-	}
+	return resbuf;
 }
 
 void outb(uint16_t port, uint8_t b) {

@@ -12,6 +12,8 @@
 #define ICW1_ICW4 1
 // Init PIC
 #define ICW1_INIT 0x10
+// Get in service interrupts
+#define OCW_IRQ_IN_SERVICE 0x0B
 
 void IRQ_INIT();
 

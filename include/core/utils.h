@@ -47,11 +47,7 @@ uint32_t indtocoord(uint16_t ind);
 
 uint16_t coordtoind(uint16_t x, uint16_t y);
 
-void printhexu8(uint8_t num);
-
-void printhexu16(uint16_t num);
-
-void printhexu32(uint32_t num);
+char* atoi(uint32_t num, uint16_t radix);
 
 void hang();
 

@@ -11,10 +11,9 @@ build:
 	nasm -felf32 -o boot.o bootloader.asm
 	# Compile the C code
 	$(CC) -c -fno-pie -save-temps -nostdlib -fno-asynchronous-unwind-tables -ffreestanding -m32 loadstuff.c -o loadstuff.o
-	$(CC) -c -fno-pie -save-temps -nostdlib -fno-asynchronous-unwind-tables -ffreestanding -m32 utils.c -o utils.o
-	$(CC) -c -fno-pie -save-temps -nostdlib -fno-asynchronous-unwind-tables -ffreestanding -m32 irq.c -o irq.o
-	$(CC) -c -fno-pie -save-temps -nostdlib -mgeneral-regs-only -fno-asynchronous-unwind-tables -ffreestanding -m32 idt.c -o idt.o
-	$(CC) -c -fno-pie -save-temps -nostdlib -mgeneral-regs-only -fno-asynchronous-unwind-tables -ffreestanding -m32 irq.c -o irq.o
+	$(CC) -c -fno-pie -save-temps -nostdlib -fno-asynchronous-unwind-tables -ffreestanding -m32 include/core/utils.c -o utils.o
+	$(CC) -c -fno-pie -save-temps -nostdlib -mgeneral-regs-only -fno-asynchronous-unwind-tables -ffreestanding -m32 include/core/idt.c -o idt.o
+	$(CC) -c -fno-pie -save-temps -nostdlib -mgeneral-regs-only -fno-asynchronous-unwind-tables -ffreestanding -m32 include/core/irq.c -o irq.o
 	# Link bootloader and C code, convert to flat binary and dump symbols
 	$(LD) boot.o loadstuff.o utils.o idt.o irq.o -m elf_i386 -T link.ld -o boot.bin
 	$(LD) boot.o loadstuff.o utils.o idt.o irq.o -m elf_i386 -T link.ld --oformat elf32-i386 -o symbols.elf
@@ -24,8 +23,5 @@ build:
 	truncate -s 1474560 boot.bin
 
 clean:
-	rm -rf *.o
-	rm -rf *.elf
-	rm -rf *.bin
-	rm -rf *.s
-	rm -rf *.i
+	# Delete all compiled files
+	find . \( -name "*.o" -o -name "*.elf" -o -name "*.bin" -o -name "*.s" -o -name "*.i" \) -exec rm {} \;

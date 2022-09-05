@@ -18,7 +18,7 @@ void set_idt_entry(uint8_t n, uint32_t isrPTR) {
 void fatalerror() {
 	print("FATAL ERROR!!!!\n");
 }
-
+/*
 void framedump(INTERRUPT_FRAME* frame) {
 	print("Some Registers at the time of the incident:\n");
 	print("IP (Instruction Pointer): 0x");
@@ -35,149 +35,149 @@ void framedump(INTERRUPT_FRAME* frame) {
 	}
 	// TODO: finish this
 	print("\n");
-}
+} */
 
-__attribute__((interrupt)) void isrGenericResrvedStub(INTERRUPT_FRAME* frame) {
+__attribute__((interrupt)) void isrGenericResrvedStub(uint8_t* ptrToNothing) {
 	cli();
 	fatalerror();
 	print("A reserved interrupt was triggered.\n");
-	framedump(frame);
+	
 	hang();
 }
 
-__attribute__((interrupt)) void isr0(INTERRUPT_FRAME* frame) {
+__attribute__((interrupt)) void isr0(uint8_t* ptrToNothing) {
 	cli();
 	print("Divide by zero error\n");
-	framedump(frame);
+	
 	hang();
 }
 
-__attribute__((interrupt)) void isr1(INTERRUPT_FRAME* frame) {
+__attribute__((interrupt)) void isr1(uint8_t* ptrToNothing) {
 	cli();
 	print("Debug interrupt triggered\n");
-	framedump(frame);
-	sit();
+	
+	sti();
 }
 
-__attribute__((interrupt)) void isr2(INTERRUPT_FRAME* frame) {
+__attribute__((interrupt)) void isr2(uint8_t* ptrToNothing) {
 	cli();
 	print("The Non-Maskable Interrupt was triggered\n");
 	sti();
 }
 
-__attribute__((interrupt)) void isr3(INTERRUPT_FRAME* frame) {
+__attribute__((interrupt)) void isr3(uint8_t* ptrToNothing) {
 	cli();
 	fatalerror();
 	print("Into Dectected Overflow\n");
-	framedump(frame);
+	
 	hang();
 }
 
-__attribute__((interrupt)) void isr4(INTERRUPT_FRAME* frame) {
+__attribute__((interrupt)) void isr4(uint8_t* ptrToNothing) {
 	cli();
 	fatalerror();
 	print("Out of Bounds\n");
-	framedump(frame);
+	
 	hang();
 }
 
-__attribute__((interrupt)) void isr5(INTERRUPT_FRAME* frame) {
+__attribute__((interrupt)) void isr5(uint8_t* ptrToNothing) {
 	cli();
 	fatalerror();
 	print("Invalid OpCode Encountered\n");
-	framedump(frame);
+	
 	hang();
 }
 
-__attribute__((interrupt)) void isr6(INTERRUPT_FRAME* frame) {
+__attribute__((interrupt)) void isr6(uint8_t* ptrToNothing) {
 	cli();
 	fatalerror();
 	print("No CoProcessor\n");
-	framedump(frame);
+	
 	hang();
 }
 
-__attribute__((interrupt)) void isr7(INTERRUPT_FRAME* frame) {
+__attribute__((interrupt)) void isr7(uint8_t* ptrToNothing) {
 	cli();
 	fatalerror();
 	print("While another fault was being handled, this fault occured.\n");
-	framedump(frame);
+	
 	hang();
 }
 
-__attribute__((interrupt)) void isr8(INTERRUPT_FRAME* frame) {
+__attribute__((interrupt)) void isr8(uint8_t* ptrToNothing) {
 	cli();
 	fatalerror();
 	print("CoProcessor Segment Overrun\n");
-	framedump(frame);
+	
 	hang();
 }
 
-__attribute__((interrupt)) void isr9(INTERRUPT_FRAME* frame) {
+__attribute__((interrupt)) void isr9(uint8_t* ptrToNothing) {
 	cli();
 	fatalerror();
 	print("Invalid TSS\n");
-	framedump(frame);
+	
 	hang();
 }
 
-__attribute__((interrupt)) void isr10(INTERRUPT_FRAME* frame) {
+__attribute__((interrupt)) void isr10(uint8_t* ptrToNothing) {
 	cli();
 	fatalerror();
 	print("Segment not present\n");
-	framedump(frame);
+	
 	hang();
 }
 
-__attribute__((interrupt)) void isr11(INTERRUPT_FRAME* frame) {
+__attribute__((interrupt)) void isr11(uint8_t* ptrToNothing) {
 	cli();
 	fatalerror();
 	print("Stack Fault\n");
-	framedump(frame);
+	
 	hang();
 }
 
-__attribute__((interrupt)) void isr12(INTERRUPT_FRAME* frame) {
+__attribute__((interrupt)) void isr12(uint8_t* ptrToNothing) {
 	cli();
 	fatalerror();
 	print("General Protection Fault\n");
-	framedump(frame);
+	
 	hang();
 }
 
-__attribute__((interrupt)) void isr13(INTERRUPT_FRAME* frame) {
+__attribute__((interrupt)) void isr13(uint8_t* ptrToNothing) {
 	cli();
 	fatalerror();
 	print("Page Fault\n");
-	framedump(frame);
+	
 	hang();
 }
 
-__attribute__((interrupt)) void isr14(INTERRUPT_FRAME* frame) {
+__attribute__((interrupt)) void isr14(uint8_t* ptrToNothing) {
 	cli();
 	fatalerror();
 	print("An unknown interrupt has been triggered\n");
-	framedump(frame);
+	
 	hang();
 }
 
-__attribute__((interrupt)) void isr15(INTERRUPT_FRAME* frame) {
+__attribute__((interrupt)) void isr15(uint8_t* ptrToNothing) {
 	cli();
 	fatalerror();
 	print("CoProcessor Fault\n");
-	framedump(frame);
+	
 	hang();
 }
 
-__attribute__((interrupt)) void isr16(INTERRUPT_FRAME* frame) {
+__attribute__((interrupt)) void isr16(uint8_t* ptrToNothing) {
 	cli();
 	fatalerror();
 	print("Unaligned memory operand\n");
-	framedump(frame);
+	
 	hang();
 }
 
-__attribute__((interrupt)) void isr17(INTERRUPT_FRAME* frame) {
+__attribute__((interrupt)) void isr17(uint8_t* ptrToNothing) {
 	cli();
 	fatalerror();
 	print("Warning! A peice of hardware (most likely the CPU) in your system has reported that it is malfunctioning.\n");
