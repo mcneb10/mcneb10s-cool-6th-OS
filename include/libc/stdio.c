@@ -72,18 +72,21 @@ int vsprintf(char* result, char* restrict fmt, va_list params) {
                     switch (numberFormat) {
                         case 0: // uint32_t
                             itoa(va_arg(params, uint32_t), buf, 10);
-                            strcpy(result+i, buf);
+                            strcpy(result+resultPtr, buf);
                             written += strlen(buf);
+                            resultPtr += strlen(buf);
                             break;
                         case 1: // uint16_t
                             itoa((uint16_t)va_arg(params, uint32_t), buf, 10);
-                            strcpy(result+i, buf);
+                            strcpy(result+resultPtr, buf);
                             written += strlen(buf);
+                            resultPtr += strlen(buf);
                             break;
                         case 2: // uint64_t
                             itoa(va_arg(params, uint64_t), buf, 10);
-                            strcpy(result+i, buf);
+                            strcpy(result+resultPtr, buf);
                             written += strlen(buf);
+                            resultPtr += strlen(buf);
                             break;
                     }
                     numberFormat = 0;
@@ -97,18 +100,21 @@ int vsprintf(char* result, char* restrict fmt, va_list params) {
                     switch (numberFormat) {
                         case 0: // uint32_t
                             itoa(va_arg(params, uint32_t), buf, 16);
-                            strcpy((result+i)-1, buf);
+                            strcpy(result+resultPtr, buf);
                             written += strlen(buf);
+                            resultPtr += strlen(buf);
                             break;
                         case 1: // uint16_t
                             itoa((uint16_t)va_arg(params, uint32_t), buf, 16);
-                            strcpy((result+i)-1, buf);
+                            strcpy(result+resultPtr, buf);
                             written += strlen(buf);
+                            resultPtr += strlen(buf);
                             break;
                         case 2: // uint64_t
                             itoa(va_arg(params, uint64_t), buf, 16);
-                            strcpy((result+i)-1, buf);
+                            strcpy(result+resultPtr, buf);
                             written += strlen(buf);
+                            resultPtr += strlen(buf);
                             break;
                     }
                     numberFormat = 0;
@@ -122,17 +128,17 @@ int vsprintf(char* result, char* restrict fmt, va_list params) {
                     switch (numberFormat) {
                         case 0: // uint32_t
                             itoa(va_arg(params, uint32_t), buf, 16);
-                            strcpy((result+i)-1, strtoupper(buf));
+                            strcpy(result+resultPtr, strtoupper(buf));
                             written += strlen(buf);
                             break;
                         case 1: // uint16_t
                             itoa((uint16_t)va_arg(params, uint32_t), buf, 16);
-                            strcpy((result+i)-1, strtoupper(buf));
+                            strcpy(result+resultPtr, strtoupper(buf));
                             written += strlen(buf);
                             break;
                         case 2: // uint64_t
                             itoa(va_arg(params, uint64_t), buf, 16);
-                            strcpy((result+i)-1, strtoupper(buf));
+                            strcpy(result+resultPtr, strtoupper(buf));
                             written += strlen(buf);
                             break;
                     }
@@ -153,8 +159,9 @@ int vsprintf(char* result, char* restrict fmt, va_list params) {
             case 's':
                 if(isFormatSpecifier) {
                     char *str = va_arg(params, char*);
-                    strcpy(result+i, str);
+                    strcpy(result+resultPtr, str);
                     written += strlen(str);
+                    resultPtr += strlen(str);
                     isFormatSpecifier = 0;
                 }  else {
                     result[resultPtr++] = fmt[i];
@@ -195,7 +202,7 @@ int vsprintf(char* result, char* restrict fmt, va_list params) {
 }
 
 int printf(char* restrict fmt, ...) {
-    char* result = malloc(5000);
+    char* result = malloc(MAX_PRINTF_OUTPUT_SIZE);
     va_list args;
     va_start(args, fmt);
     int written = vsprintf(result, fmt, args);
