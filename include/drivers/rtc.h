@@ -1,6 +1,6 @@
 #ifndef OS6_RTC_H
 #define OS6_RTC_H
-#include "utils.h"
+#include "../core/utils.h"
 
 void rtcinit();
 

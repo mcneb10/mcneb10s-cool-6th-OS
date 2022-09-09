@@ -1,7 +1,9 @@
 #ifndef OS6_IRQ_H
 #define OS6_IRQ_H
 
-#include "utils.h"
+#include "../core/utils.h"
+#include "../libc/stdio.h"
+#include "idt.h"
 
 #define MASTER_PIC_COMMAND 0x20
 #define MASTER_PIC_DATA 0x21
@@ -16,5 +18,7 @@
 #define OCW_IRQ_IN_SERVICE 0x0B
 
 void IRQ_INIT();
+
+uint64_t getPitTicks();
 
 #endif

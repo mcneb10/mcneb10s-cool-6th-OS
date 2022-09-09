@@ -3,12 +3,37 @@ bits 16
 section .bootloader
 global start
 extern stage2
+; FAT12 header stuff
+jmp short start
+nop
+db 'OS6BOOT '
+; possible other 8 bytes?
+dw 512d ; bytes per sector
+db 1;8d ; sectors per cluster?
+dw 1 ; reserved sectors
+db 2d ; FATs count
+dw 224d ; max root directory count
+dw 2880 ; total sectors count
+db 0xF0 ; media type
+dw 9 ; sectors per FAT
+dw 18d ;sectors per track
+dw 2 ; number of heads
+dd 0 ; number of hidden sectors
+dd 0 ; unused large sector count
+
+db 0 ;drive number
+db 0;flags
+db 0x29;sig
+dd 0x69696969 ; serial number
+db 'OS6BOOTDISK'
+db 'FAT12   '
+
 start:
 ; STAGE 0 Load stuff
 ; save drive number
 mov byte [drv], dl
 mov ah, 2 ; read mode
-mov al, 18 ; 18 sectors
+mov al, 50 ; read as many sectors as possible
 mov ch, 0 ; cylinder
 mov cl, 2 ;sectors start at 1, first is bootloader
 mov dh, 0 ; head 0
@@ -18,9 +43,10 @@ xor bx, bx
 mov es, bx
 mov bx, 0x7E00 ; load next stage into 0000:7E00
 int 0x13 ;call system
+
 ; Stage 1 enter protected mode
 ; disable hardware interrupts
-; we must do this because the timer is constantly sending interrupts to the CPU
+; we must do this because the PIT is constantly sending interrupts to the CPU
 ; after we enter protected mode, the CPU doesn't know what to do with this interrupt
 ; and restarts itself, causing a bootloop
 ; we'll re-enable them once we tell the CPU how to handle the timer
@@ -54,7 +80,7 @@ jmp stage2
 ;; Variables ;;
 ; Drive number
 drv: dd 0
-;; GDT;;
+;; GDT ;;
 gdt:
 	dq 0 ; null entry
 	; second entry

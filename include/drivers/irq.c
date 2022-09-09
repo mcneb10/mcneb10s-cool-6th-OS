@@ -1,10 +1,9 @@
 #include "irq.h"
-#include "idt.h"
-#include "utils.h"
 
 #pragma region IRQS
+// Rolls over every 584942 years, 152 days, 8 hours, 1 minutes, 49.5 seconds
 
-uint64_t pitTicks = 0;
+static uint64_t pitTicks;
 
 #define masterEOI() outb(MASTER_PIC_COMMAND, 0x20)
 
@@ -13,14 +12,15 @@ uint64_t pitTicks = 0;
 // PIT
 __attribute__((interrupt)) void irq0(uint8_t* ptrToNothing) {
     cli();
-    pitTicks++;
+    pitTicks+=1;
+    printf("\r%u", pitTicks);
     masterEOI();
     sti();
 }
 // Keyboard
 __attribute__((interrupt)) void irq1(uint8_t* ptrToNothing) {
     cli();
-    print("Keyboard\n");
+    tty_print("Keyboard\n");
     masterEOI();
     sti();
 }
@@ -52,14 +52,14 @@ __attribute__((interrupt)) void irq6(uint8_t* ptrToNothing) {
     masterEOI();
     sti();
 }
-uint64_t spuriousCount = 0;
+volatile uint64_t spuriousCount = 0;
 // LPT1 or spurious interrupt
 __attribute__((interrupt)) void irq7(uint8_t* ptrToNothing) {
     cli();
     // Was an interrupt actually triggered
     outb(MASTER_PIC_COMMAND, OCW_IRQ_IN_SERVICE);
     if(inb(MASTER_PIC_COMMAND) & 0b10000000) {
-        // Yes, do stuff and send EOI
+        // Yes, do stuff with LPT1 and send EOI
 
         masterEOI();
     } else {
@@ -137,7 +137,7 @@ void IRQ_INIT() {
     io_wait();
     outb(SLAVE_PIC_COMMAND, ICW1_INIT | ICW1_ICW4);
     io_wait();
-    // PIC offsets (remaps IRQs so they don't clash with interrupts reserved for errors)
+    // PIC offsets (remaps IRQs, so they don't clash with interrupts reserved for errors)
     outb(MASTER_PIC_DATA, 0x20);
     io_wait();
     outb(SLAVE_PIC_DATA, 0x28);
@@ -174,4 +174,10 @@ void IRQ_INIT() {
     set_idt_entry(45, (uint32_t)irq13);
     set_idt_entry(46, (uint32_t)irq14);
     set_idt_entry(47, (uint32_t)irq15);
+
+    pitTicks = 0;
+}
+
+uint64_t getPitTicks() {
+    return pitTicks;
 }

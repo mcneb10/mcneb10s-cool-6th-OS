@@ -1,6 +1,10 @@
 #ifndef OS6_IDT_H
 #define OS6_IDT_H
-#include "utils.h"
+
+#include <stdint.h>
+#include "io.h"
+#include "tty.h"
+#include "../core/utils.h"
 
 #pragma pack(push, 1)
 typedef struct {
