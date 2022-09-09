@@ -17,6 +17,7 @@ include/drivers/rtc.o\
 include/drivers/sleep.o\
 include/drivers/tty.o\
 include/drivers/cpuid.o\
+include/drivers/cpuidhelper.o\
 include/drivers/parallelport.o
 
 CLIB_STUFF_OBJS=\
@@ -55,7 +56,7 @@ libd.a
 
 include makefile.conf
 
-.SUFFIXES:.o .c .S
+.SUFFIXES:.o .c .S .asm
 
 redo: rebuild run
 
@@ -78,6 +79,9 @@ include/crtbegin.o include/crtend.o:
 
 $(INTERRUPT_OBJS):
 	$(CC) -c -mgeneral-regs-only -mno-red-zone $(CFLAGS) $(EXTRACOPTS) $(basename $@).c -o $@
+
+.asm.o:
+	nasm -felf32 $< -o $@
 
 .c.o:
 	$(CC) -c -Wall -Wextra $(CFLAGS) $(EXTRACOPTS) $< -o $@
