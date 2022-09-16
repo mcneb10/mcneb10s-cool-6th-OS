@@ -1,26 +1,31 @@
 #include "irq.h"
 
 #pragma region IRQS
-// Rolls over every 584942 years, 152 days, 8 hours, 1 minutes, 49.5 seconds
+// Rolls over every 584942 years, 152 days, 8 hours, 1 minutes, 49.5 seconds if microseconds
 
-static uint64_t pitTicks;
+volatile static uint64_t pitTicks;
 
 #define masterEOI() outb(MASTER_PIC_COMMAND, 0x20)
 
-#define slaveEOI() (outb(SLAVE_PIC_COMMAND, 0x20),outb(MASTER_PIC_COMMAND, 0x20))
+#define slaveEOI() \
+outb(MASTER_PIC_COMMAND, 0x20);\
+outb(SLAVE_PIC_COMMAND, 0x20)
+
+char string[20];
 
 // PIT
 __attribute__((interrupt)) void irq0(uint8_t* ptrToNothing) {
     cli();
     pitTicks+=1;
-    printf("\r%u", pitTicks);
     masterEOI();
     sti();
 }
 // Keyboard
 __attribute__((interrupt)) void irq1(uint8_t* ptrToNothing) {
     cli();
-    tty_print("Keyboard\n");
+    tty_putc((char)inb(0x60));
+    inb(PS2_DATA_PORT);
+    inb(PS2_DATA_PORT);
     masterEOI();
     sti();
 }
@@ -41,7 +46,7 @@ __attribute__((interrupt)) void irq4(uint8_t* ptrToNothing) {
 // LPT2
 __attribute__((interrupt)) void irq5(uint8_t* ptrToNothing) {
     cli();
-
+    parallel_handle_interrupt(2);
     masterEOI();
     sti();
 }
@@ -60,7 +65,7 @@ __attribute__((interrupt)) void irq7(uint8_t* ptrToNothing) {
     outb(MASTER_PIC_COMMAND, OCW_IRQ_IN_SERVICE);
     if(inb(MASTER_PIC_COMMAND) & 0b10000000) {
         // Yes, do stuff with LPT1 and send EOI
-
+        parallel_handle_interrupt(1);
         masterEOI();
     } else {
         // No, increment a counter and DON'T send EOI
@@ -96,7 +101,7 @@ __attribute__((interrupt)) void irq11(uint8_t* ptrToNothing) {
     slaveEOI();
     sti();
 }
-// PS2 mouse
+// PS2 mouse or secondary PS2 device
 __attribute__((interrupt)) void irq12(uint8_t* ptrToNothing) {
     cli();
 
@@ -117,11 +122,20 @@ __attribute__((interrupt)) void irq14(uint8_t* ptrToNothing) {
     slaveEOI();
     sti();
 }
-// ATA HDD 2
+// ATA HDD 2 or spurious irq 2
 __attribute__((interrupt)) void irq15(uint8_t* ptrToNothing) {
     cli();
+    // Was an interrupt actually triggered
+    outb(MASTER_PIC_COMMAND, OCW_IRQ_IN_SERVICE);
+    if(inb(SLAVE_PIC_COMMAND) & 0b10000000) {
+        // Yes, do stuff with ATA HDD 2 and send EOI to master and slave PICs
 
-    slaveEOI();
+        slaveEOI();
+    } else {
+        // No, increment a counter and send EOI to ONLY the master PIC
+        spuriousCount++;
+        masterEOI();
+    }
     sti();
 }
 #pragma endregion

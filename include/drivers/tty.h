@@ -48,4 +48,8 @@ uint32_t tty_indtocoord(uint16_t ind);
 
 uint16_t tty_coordtoind(uint16_t x, uint16_t y);
 
+void tty_cursor_setpos_xy(uint16_t x, uint16_t y);
+
+uint32_t tty_cursor_getpos_xy();
+
 #endif //OS6_TTY_H

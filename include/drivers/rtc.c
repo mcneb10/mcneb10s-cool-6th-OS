@@ -1,5 +1,7 @@
 #include "rtc.h"
 
+// TODO: finish rtc
+
 void rtcinit() {
     // Disable interrupts
     cli();

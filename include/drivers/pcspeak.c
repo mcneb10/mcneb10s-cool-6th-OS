@@ -10,7 +10,6 @@ void playsound(uint32_t freq, uint16_t timeMs) {
     // Turn on speaker and tell it to listen accept frequency from PIT channel 2
     outb(0x61, inb(0x61) & 0b11);
     // Wait for duration of sound
-    // TODO: insert sleep func
     msleep(timeMs);
     // Turn off speaker
     outb(0x61, inb(0x61) & 0b11111100);

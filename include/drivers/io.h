@@ -11,9 +11,11 @@ void outl(uint16_t port, uint32_t b);
 
 uint32_t inl(uint16_t port);
 
-#define io_wait() outb(0x80, 0);
+#define io_wait() outb(0x80, 0)
 
 #define cli() __asm__("cli")
 #define sti() __asm__("sti")
+
+#define pause() __asm__("pause")
 
 #endif //OS6_IO_H

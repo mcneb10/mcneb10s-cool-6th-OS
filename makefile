@@ -7,7 +7,9 @@ LDFLAGS:=-lgcc -m elf_i386 -T link.ld
 
 CORE=\
 include/core/mem.o\
-include/core/utils.o
+include/core/utils.o\
+include/core/serviceInterrupt.o\
+include/core/serviceInterruptHandler.o
 
 DRIVERS=\
 include/drivers/io.o\
@@ -17,7 +19,7 @@ include/drivers/rtc.o\
 include/drivers/sleep.o\
 include/drivers/tty.o\
 include/drivers/cpuid.o\
-include/drivers/cpuidhelper.o\
+include/drivers/ps2.o\
 include/drivers/parallelport.o
 
 CLIB_STUFF_OBJS=\
@@ -81,7 +83,7 @@ $(INTERRUPT_OBJS):
 	$(CC) -c -mgeneral-regs-only -mno-red-zone $(CFLAGS) $(EXTRACOPTS) $(basename $@).c -o $@
 
 .asm.o:
-	nasm -felf32 $< -o $@
+	nasm -f elf32 $< -o $@
 
 .c.o:
 	$(CC) -c -Wall -Wextra $(CFLAGS) $(EXTRACOPTS) $< -o $@
@@ -103,8 +105,9 @@ boot.bin: $(LINK_OBJS)
 	# Link bootloader and C code, convert to flat binary and dump symbols
 	$(LD) $(LINK_OBJS) $(EXTRALDOPTS) -L$(CRTPATH) $(LDFLAGS) -o boot.bin
 	$(LD) $(LINK_OBJS) $(EXTRALDOPTS) -L$(CRTPATH) $(LDFLAGS) --oformat elf32-i386 -o symbols.elf
-	@echo -n "Size of boot.bin before padding to fit floppy disk (in bytes): "
-	@wc -c boot.bin | grep -o '^\S*'
+	FAT_OFFSET=$(wc -c boot.bin | grep -o '^\S*')
+	@echo "Size of boot.bin before padding to fit floppy disk (in bytes): $(FAT_OFFSET)"
+	#mkfs.fat -D 0 -F 12 -g 2/18 -n OS6BOOT --mbr no --offset $(FAT_OFFSET) boot.bin
 	# Pad output to size of 1.44MB floppy
 	truncate -s 1474560 boot.bin
 

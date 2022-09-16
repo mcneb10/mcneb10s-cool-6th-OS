@@ -4,6 +4,8 @@
 #include "../core/utils.h"
 #include "../libc/stdio.h"
 #include "idt.h"
+#include "ps2.h"
+#include "parallelport.h"
 
 #define MASTER_PIC_COMMAND 0x20
 #define MASTER_PIC_DATA 0x21

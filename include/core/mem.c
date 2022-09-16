@@ -10,7 +10,7 @@ uint8_t initialized = 0;
 void* malloc(uint32_t size) {
     void* initialPtr = bigFreeSpace;
     if(initialized) {
-        for (uint16_t x = 0; x < FREESPACE_ENTRY_MAX; x++) {
+        for (uint32_t x = 0; x < FREESPACE_ENTRY_MAX; x++) {
             if (freeSpace[x].freeSpaceSize >= size) {
                 initialPtr = freeSpace[x].freeSpacePtr;
                 freeSpace[x].freeSpacePtr += size + sizeof(MEM_AREA_DESCRIPTOR);
@@ -22,7 +22,7 @@ void* malloc(uint32_t size) {
     ((MEM_AREA_DESCRIPTOR*)initialPtr)->owner = 0x0; // reserved fo future use
 
     bigFreeSpace+=sizeof(MEM_AREA_DESCRIPTOR);
-    for(uint32_t i=0;i<size;i++) {
+    for(uint32_t i=sizeof(MEM_AREA_DESCRIPTOR);i<size;i++) {
         *(((uint8_t*)initialPtr)+i) = 0;
     }
     void* ptr = (void*)bigFreeSpace;
@@ -49,7 +49,7 @@ void free(void* mem) {
         ((uint8_t*)mem)[i] = 0;
     }
     if(freeSpacePtr < FREESPACE_ENTRY_MAX) {
-        freeSpace[freeSpacePtr].freeSpacePtr = mem;
+        freeSpace[freeSpacePtr].freeSpacePtr = mem-sizeof(MEM_AREA_DESCRIPTOR);
         freeSpace[freeSpacePtr].freeSpaceSize = memAreaDescriptor->size;
         freeSpacePtr++;
     }

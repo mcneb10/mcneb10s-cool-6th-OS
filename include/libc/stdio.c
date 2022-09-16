@@ -37,13 +37,12 @@ int sprintf(char* result, char* restrict fmt, ...) {
 }
 
 int vsprintf(char* result, char* restrict fmt, va_list params) {
+    char buf[MAX_PRINTF_OUTPUT_SIZE];
     uint8_t isFormatSpecifier = 0;
     uint8_t escapedPercent = 0;
     uint8_t numberFormat = 0;
     uint32_t len = strlen(fmt);
     uint32_t resultPtr = 0;
-    int written = 0;
-    char* buf = malloc(100);
     for(uint32_t i=0;i<len;i++) {
         switch (fmt[i]) {
             case '%':
@@ -62,7 +61,6 @@ int vsprintf(char* result, char* restrict fmt, va_list params) {
                 if(i==len-1) break;
                 if(!(escapedPercent = fmt[i+1] == '%')) {
                     result[resultPtr++] = fmt[i];
-                    written++;
                 }
                 break;
             case 'i': // TODO: implement signed integers
@@ -73,26 +71,22 @@ int vsprintf(char* result, char* restrict fmt, va_list params) {
                         case 0: // uint32_t
                             itoa(va_arg(params, uint32_t), buf, 10);
                             strcpy(result+resultPtr, buf);
-                            written += strlen(buf);
                             resultPtr += strlen(buf);
                             break;
                         case 1: // uint16_t
                             itoa((uint16_t)va_arg(params, uint32_t), buf, 10);
                             strcpy(result+resultPtr, buf);
-                            written += strlen(buf);
                             resultPtr += strlen(buf);
                             break;
                         case 2: // uint64_t
                             itoa(va_arg(params, uint64_t), buf, 10);
                             strcpy(result+resultPtr, buf);
-                            written += strlen(buf);
                             resultPtr += strlen(buf);
                             break;
                     }
                     numberFormat = 0;
                 } else {
                         result[resultPtr++] = fmt[i];
-                        written++;
                 }
                 break;
             case 'x':
@@ -101,26 +95,22 @@ int vsprintf(char* result, char* restrict fmt, va_list params) {
                         case 0: // uint32_t
                             itoa(va_arg(params, uint32_t), buf, 16);
                             strcpy(result+resultPtr, buf);
-                            written += strlen(buf);
                             resultPtr += strlen(buf);
                             break;
                         case 1: // uint16_t
                             itoa((uint16_t)va_arg(params, uint32_t), buf, 16);
                             strcpy(result+resultPtr, buf);
-                            written += strlen(buf);
                             resultPtr += strlen(buf);
                             break;
                         case 2: // uint64_t
                             itoa(va_arg(params, uint64_t), buf, 16);
                             strcpy(result+resultPtr, buf);
-                            written += strlen(buf);
                             resultPtr += strlen(buf);
                             break;
                     }
                     numberFormat = 0;
                 } else {
                     result[resultPtr++] = fmt[i];
-                    written++;
                 }
                 break;
             case 'X':
@@ -129,23 +119,22 @@ int vsprintf(char* result, char* restrict fmt, va_list params) {
                         case 0: // uint32_t
                             itoa(va_arg(params, uint32_t), buf, 16);
                             strcpy(result+resultPtr, strtoupper(buf));
-                            written += strlen(buf);
+                            resultPtr += strlen(buf);
                             break;
                         case 1: // uint16_t
                             itoa((uint16_t)va_arg(params, uint32_t), buf, 16);
                             strcpy(result+resultPtr, strtoupper(buf));
-                            written += strlen(buf);
+                            resultPtr += strlen(buf);
                             break;
                         case 2: // uint64_t
                             itoa(va_arg(params, uint64_t), buf, 16);
                             strcpy(result+resultPtr, strtoupper(buf));
-                            written += strlen(buf);
+                            resultPtr += strlen(buf);
                             break;
                     }
                     numberFormat = 0;
                 } else {
                     result[resultPtr++] = fmt[i];
-                    written++;
                 }
                 break;
             case 'c':
@@ -153,19 +142,16 @@ int vsprintf(char* result, char* restrict fmt, va_list params) {
                     result[resultPtr++] = (char)va_arg(params, uint32_t);
                 } else {
                     result[resultPtr++] = fmt[i];
-                    written++;
                 }
                 break;
             case 's':
                 if(isFormatSpecifier) {
                     char *str = va_arg(params, char*);
                     strcpy(result+resultPtr, str);
-                    written += strlen(str);
                     resultPtr += strlen(str);
                     isFormatSpecifier = 0;
                 }  else {
                     result[resultPtr++] = fmt[i];
-                    written++;
                 }
                 break;
             case 'h':
@@ -173,7 +159,6 @@ int vsprintf(char* result, char* restrict fmt, va_list params) {
                     numberFormat = 1;
                 } else {
                     result[resultPtr++] = fmt[i];
-                    written++;
                 }
                 break;
             case 'l':
@@ -181,7 +166,6 @@ int vsprintf(char* result, char* restrict fmt, va_list params) {
                     numberFormat = 2;
                 } else {
                     result[resultPtr++] = fmt[i];
-                    written++;
                 }
                 break;
             default:
@@ -190,24 +174,22 @@ int vsprintf(char* result, char* restrict fmt, va_list params) {
                     break;
                 }
                 result[resultPtr++] = fmt[i];
-                written++;
                 break;
         }
         if(isFormatSpecifier && fmt[i] != '%') {
             isFormatSpecifier = 0;
         }
     }
-    free(buf);
-    return written;
+    return resultPtr;
 }
 
 int printf(char* restrict fmt, ...) {
-    char* result = malloc(MAX_PRINTF_OUTPUT_SIZE);
+    char buf[MAX_PRINTF_OUTPUT_SIZE];
+    memset(buf, 0, MAX_PRINTF_OUTPUT_SIZE);
     va_list args;
     va_start(args, fmt);
-    int written = vsprintf(result, fmt, args);
-    tty_print(result);
-    free(result);
+    int written = vsprintf(buf, fmt, args);
+    tty_print(buf);
     va_end(args);
     return written;
 }

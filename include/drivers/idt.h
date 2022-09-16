@@ -33,11 +33,11 @@ typedef struct {
 	uint32_t offset;
 } IDT_DESCRIPTOR;
 typedef struct {
-	uint16_t ip;
-	uint16_t cs;
-	uint16_t flags;
-	uint16_t sp;
-	uint16_t ss;
+	uint32_t ip;
+	uint32_t cs;
+	uint32_t flags;
+	uint32_t sp;
+	uint32_t ss;
 } INTERRUPT_FRAME;
 #pragma pack(pop)
 

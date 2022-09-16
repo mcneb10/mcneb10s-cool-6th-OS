@@ -43,12 +43,11 @@ typedef union pcr {
 #define channel0Data 0x40
 #define channel1Data 0x41
 #define channel2Data 0x42
-#define commandRegister 0x42
+#define commandRegister 0x43
 
-#define PIT_FREQ_CONST 1193181
+#define PIT_FREQ_CONST 1193180
 
 void sleep_init();
-
 
 void msleep(uint64_t time);
 
