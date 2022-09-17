@@ -5,4 +5,6 @@
 
 void hang();
 
+#define breakpoint() __asm__("int3")
+
 #endif

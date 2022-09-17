@@ -14,12 +14,12 @@ extern uint64_t pitTicks;
 
 void cpuidDump() {
     char namestring[48];
-    char* vendorstring[12];
+    char* vendorstring[15];
     printf
     (
             "CPU String: %s\nCPU Vendor string: %s\n",
             cpuid_brandString(namestring) ? namestring : "None",
-            cpuid_vendorString(vendorstring) ? vendorstring : "Duuude your computer is old or janky as hell!\nIt doesn't even have a vendor string!"
+            cpuid_vendorString(vendorstring) ? vendorstring : "Duuude your CPU is old or janky as hell!\nIt doesn't even have a vendor string!"
     );
     //TODO: implement more CPUID stuff
 }

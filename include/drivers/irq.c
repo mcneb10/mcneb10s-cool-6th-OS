@@ -3,7 +3,7 @@
 #pragma region IRQS
 // Rolls over every 584942 years, 152 days, 8 hours, 1 minutes, 49.5 seconds if microseconds
 
-volatile static uint64_t pitTicks;
+volatile uint64_t pitTicks;
 
 #define masterEOI() outb(MASTER_PIC_COMMAND, 0x20)
 
@@ -13,17 +13,21 @@ outb(SLAVE_PIC_COMMAND, 0x20)
 
 char string[20];
 
+extern void irq0();
+
+/*
+ * Handle this with assembly instead
 // PIT
 __attribute__((interrupt)) void irq0(uint8_t* ptrToNothing) {
     cli();
     pitTicks+=1;
     masterEOI();
     sti();
-}
+} */
 // Keyboard
 __attribute__((interrupt)) void irq1(uint8_t* ptrToNothing) {
     cli();
-    tty_putc((char)inb(0x60));
+    ps2_handle_interrupt(1);
     inb(PS2_DATA_PORT);
     inb(PS2_DATA_PORT);
     masterEOI();
@@ -43,14 +47,14 @@ __attribute__((interrupt)) void irq4(uint8_t* ptrToNothing) {
     masterEOI();
     sti();
 }
-// LPT2
+// LPT2 or other?
 __attribute__((interrupt)) void irq5(uint8_t* ptrToNothing) {
     cli();
-    parallel_handle_interrupt(2);
+    parallel_handle_interrupt(LPT2);
     masterEOI();
     sti();
 }
-// Floppy Disk
+// Floppy Disk or LPT2
 __attribute__((interrupt)) void irq6(uint8_t* ptrToNothing) {
     cli();
 
@@ -65,7 +69,7 @@ __attribute__((interrupt)) void irq7(uint8_t* ptrToNothing) {
     outb(MASTER_PIC_COMMAND, OCW_IRQ_IN_SERVICE);
     if(inb(MASTER_PIC_COMMAND) & 0b10000000) {
         // Yes, do stuff with LPT1 and send EOI
-        parallel_handle_interrupt(1);
+        parallel_handle_interrupt(LPT1);
         masterEOI();
     } else {
         // No, increment a counter and DON'T send EOI
@@ -190,8 +194,4 @@ void IRQ_INIT() {
     set_idt_entry(47, (uint32_t)irq15);
 
     pitTicks = 0;
-}
-
-uint64_t getPitTicks() {
-    return pitTicks;
 }

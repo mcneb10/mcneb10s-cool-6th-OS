@@ -42,8 +42,6 @@ typedef struct {
 #pragma pack(pop)
 
 #define IDT_ENTRY_COUNT 256
-IDT_ENTRY idt[IDT_ENTRY_COUNT];
-IDT_DESCRIPTOR idtr;
 
 void IDT_INIT();
 void set_idt_entry(uint8_t n, uint32_t isrPTR);

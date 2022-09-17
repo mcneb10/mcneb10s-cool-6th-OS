@@ -80,4 +80,6 @@ uint16_t ps2_init();
 
 PS2_DEVICE_TYPE ps2_get_device_type();
 
+void ps2_handle_interrupt(uint8_t port);
+
 #endif //OS6_PS2_H

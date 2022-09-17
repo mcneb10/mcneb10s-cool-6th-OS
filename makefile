@@ -1,15 +1,15 @@
-CC := gcc
 .PHONY: do run build clean rebuild
 
-CFLAGS:=-fno-pie -save-temps -nostdlib -ffreestanding -g -m32 -DDebug
+CFLAGS+=-fno-pie -save-temps -nostdlib -ffreestanding -g -m32 -DDebug
 
-LDFLAGS:=-lgcc -m elf_i386 -T link.ld
+LDFLAGS+=-lgcc -m elf_i386 -T link.ld
 
 CORE=\
 include/core/mem.o\
 include/core/utils.o\
 include/core/serviceInterrupt.o\
-include/core/serviceInterruptHandler.o
+include/core/serviceInterruptHandler.o\
+include/core/wumbo.o
 
 DRIVERS=\
 include/drivers/io.o\
@@ -20,7 +20,8 @@ include/drivers/sleep.o\
 include/drivers/tty.o\
 include/drivers/cpuid.o\
 include/drivers/ps2.o\
-include/drivers/parallelport.o
+include/drivers/parallelport.o\
+include/drivers/pit.o
 
 CLIB_STUFF_OBJS=\
 include/crti.o \
@@ -49,12 +50,17 @@ LIBD_OBJS=\
 $(DRIVERS)\
 $(INTERRUPT_OBJS)
 
+# The mystery of wumbo
+# Even though it is part of libcore and is linked with the rest of the kernel,
+# Other objects can't resolve symbols unless it is linked directly
+
 LINK_OBJS=\
 boot.o\
 loadstuff.o\
 libcore.a\
 libc.a\
-libd.a
+libd.a\
+include/core/wumbo.o
 
 include makefile.conf
 
@@ -80,13 +86,13 @@ include/crtbegin.o include/crtend.o:
 	cp "$(CRTPATH)/crtend.o" include
 
 $(INTERRUPT_OBJS):
-	$(CC) -c -mgeneral-regs-only -mno-red-zone $(CFLAGS) $(EXTRACOPTS) $(basename $@).c -o $@
+	$(CC) -c -mgeneral-regs-only -mno-red-zone $(CFLAGS) $(basename $@).c -o $@
 
 .asm.o:
 	nasm -f elf32 $< -o $@
 
 .c.o:
-	$(CC) -c -Wall -Wextra $(CFLAGS) $(EXTRACOPTS) $< -o $@
+	$(CC) -c -Wall -Wextra $(CFLAGS) $< -o $@
 
 .S.o:
 	$(AS) -c -nostdlib -march=i386 --32 $< -o $@
@@ -103,8 +109,8 @@ libd.a: $(LIBD_OBJS)
 
 boot.bin: $(LINK_OBJS)
 	# Link bootloader and C code, convert to flat binary and dump symbols
-	$(LD) $(LINK_OBJS) $(EXTRALDOPTS) -L$(CRTPATH) $(LDFLAGS) -o boot.bin
-	$(LD) $(LINK_OBJS) $(EXTRALDOPTS) -L$(CRTPATH) $(LDFLAGS) --oformat elf32-i386 -o symbols.elf
+	$(LD) $(LINK_OBJS) -L$(CRTPATH) $(LDFLAGS) -o boot.bin
+	$(LD) $(LINK_OBJS) -L$(CRTPATH) $(LDFLAGS) --oformat elf32-i386 -o symbols.elf
 	FAT_OFFSET=$(wc -c boot.bin | grep -o '^\S*')
 	@echo "Size of boot.bin before padding to fit floppy disk (in bytes): $(FAT_OFFSET)"
 	#mkfs.fat -D 0 -F 12 -g 2/18 -n OS6BOOT --mbr no --offset $(FAT_OFFSET) boot.bin

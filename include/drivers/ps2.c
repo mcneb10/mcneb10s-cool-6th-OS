@@ -1,4 +1,5 @@
 #include "ps2.h"
+#include "../core/wumbo.h"
 
 uint8_t ps2_send_command_nodata(uint8_t command) {
     outb(PS2_COMMAND_AND_STATUS, command);
@@ -84,4 +85,15 @@ uint16_t ps2_init() {
 
     sti();
     return 0;
+}
+
+void ps2_handle_interrupt(uint8_t port) {
+    switch(port) {
+        case 1:
+            break;
+        case 2:
+            break;
+        default:
+            wumbo_exit_func("Wtf why is the OS trying to respond to and interrupt from PS2 port %u\nOnly ports 1 and 2 are are supported.\n", port);
+    }
 }

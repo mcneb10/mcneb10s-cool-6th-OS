@@ -2,6 +2,7 @@
 extern serviceInterrupt
 global serviceInterruptHandler
 serviceInterruptHandler:
+    cli
     pushad
     push edx
     push ecx
@@ -9,4 +10,5 @@ serviceInterruptHandler:
     push eax
     call serviceInterrupt
     popad
+    sti
     iret

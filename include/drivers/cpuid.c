@@ -28,6 +28,7 @@ uint8_t cpuid_vendorString(char* out) {
     out[9] = (char)(c>>8);
     out[10] = (char)(c>>16);
     out[11] = (char)(c>>24);
+    out[12] = 0;
     return b | c | d;
 }
 

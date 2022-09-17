@@ -6,6 +6,7 @@
 #include "io.h"
 #include "sleep.h"
 #include "../libc/stdio.h"
+#include "../core/wumbo.h"
 
 #define LPT1 0x378
 #define PARALLEL1_DATA_PORT LPT1
@@ -30,5 +31,7 @@ void parallel_print(uint16_t port, char* str);
 void parallel_printf(uint16_t port, char* restrict fmt, ...);
 
 void parallel_handle_interrupt(uint16_t port);
+
+#define parallel_port_sanity_check(port) if(port != LPT1 && port != LPT2) { wumbo_exit_func("Invalid LPT IO port 0x%hx\n", port); }
 
 #endif

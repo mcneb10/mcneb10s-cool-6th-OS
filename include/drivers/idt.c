@@ -1,5 +1,8 @@
 #include "idt.h"
 
+IDT_ENTRY idt[IDT_ENTRY_COUNT];
+IDT_DESCRIPTOR idtr;
+
 void set_idt_entry(uint8_t n, uint32_t isrPTR) {
 	idt[n].offsetLowWord = isrPTR & 0xFFFF;
 	idt[n].segSelector = 8; // Select code (where the code is running from)
@@ -53,7 +56,7 @@ __attribute__((interrupt)) void isr0(uint8_t* ptrToNothing) {
 
 __attribute__((interrupt)) void isr1(uint8_t* ptrToNothing) {
 	cli();
-	tty_print("Debug interrupt triggered\n");
+	//tty_print("Debug interrupt triggered\n");
 	
 	sti();
 }
@@ -65,17 +68,16 @@ __attribute__((interrupt)) void isr2(uint8_t* ptrToNothing) {
 }
 
 __attribute__((interrupt)) void isr3(uint8_t* ptrToNothing) {
-	cli();
-	fatalerror();
-	tty_print("Into Dectected Overflow\n");
-	
-	hang();
+    cli();
+    // Debug interrupt
+
+    hang();
 }
 
 __attribute__((interrupt)) void isr4(uint8_t* ptrToNothing) {
 	cli();
 	fatalerror();
-	tty_print("Out of Bounds\n");
+	tty_print("Overflow\n");
 	
 	hang();
 }
@@ -83,7 +85,7 @@ __attribute__((interrupt)) void isr4(uint8_t* ptrToNothing) {
 __attribute__((interrupt)) void isr5(uint8_t* ptrToNothing) {
 	cli();
 	fatalerror();
-	tty_print("Invalid OpCode Encountered\n");
+	tty_print("Out of Bounds\n");
 	
 	hang();
 }
@@ -91,7 +93,7 @@ __attribute__((interrupt)) void isr5(uint8_t* ptrToNothing) {
 __attribute__((interrupt)) void isr6(uint8_t* ptrToNothing) {
 	cli();
 	fatalerror();
-	tty_print("No CoProcessor\n");
+	tty_print("Invalid OpCode Encountered\n");
 	
 	hang();
 }
@@ -99,7 +101,7 @@ __attribute__((interrupt)) void isr6(uint8_t* ptrToNothing) {
 __attribute__((interrupt)) void isr7(uint8_t* ptrToNothing) {
 	cli();
 	fatalerror();
-	tty_print("While another fault was being handled, this fault occured.\n");
+	tty_print("No CoProcessor\n");
 	
 	hang();
 }
@@ -107,7 +109,7 @@ __attribute__((interrupt)) void isr7(uint8_t* ptrToNothing) {
 __attribute__((interrupt)) void isr8(uint8_t* ptrToNothing) {
 	cli();
 	fatalerror();
-	tty_print("CoProcessor Segment Overrun\n");
+	tty_print("While another fault was being handled, this fault occured.\n");
 	
 	hang();
 }
@@ -115,7 +117,7 @@ __attribute__((interrupt)) void isr8(uint8_t* ptrToNothing) {
 __attribute__((interrupt)) void isr9(uint8_t* ptrToNothing) {
 	cli();
 	fatalerror();
-	tty_print("Invalid TSS\n");
+	tty_print("CoProcessor Segment Overrun\n");
 	
 	hang();
 }
@@ -123,7 +125,7 @@ __attribute__((interrupt)) void isr9(uint8_t* ptrToNothing) {
 __attribute__((interrupt)) void isr10(uint8_t* ptrToNothing) {
 	cli();
 	fatalerror();
-	tty_print("Segment not present\n");
+	tty_print("Invalid TSS\n");
 	
 	hang();
 }
@@ -131,7 +133,7 @@ __attribute__((interrupt)) void isr10(uint8_t* ptrToNothing) {
 __attribute__((interrupt)) void isr11(uint8_t* ptrToNothing) {
 	cli();
 	fatalerror();
-	tty_print("Stack Fault\n");
+	tty_print("Segment not present\n");
 	
 	hang();
 }
@@ -139,7 +141,7 @@ __attribute__((interrupt)) void isr11(uint8_t* ptrToNothing) {
 __attribute__((interrupt)) void isr12(uint8_t* ptrToNothing) {
 	cli();
 	fatalerror();
-	tty_print("General Protection Fault\n");
+	tty_print("Stack Fault\n");
 	
 	hang();
 }
@@ -147,7 +149,7 @@ __attribute__((interrupt)) void isr12(uint8_t* ptrToNothing) {
 __attribute__((interrupt)) void isr13(uint8_t* ptrToNothing) {
 	cli();
 	fatalerror();
-	tty_print("Page Fault\n");
+	tty_print("General Protection Fault\n");
 	
 	hang();
 }
@@ -155,7 +157,7 @@ __attribute__((interrupt)) void isr13(uint8_t* ptrToNothing) {
 __attribute__((interrupt)) void isr14(uint8_t* ptrToNothing) {
 	cli();
 	fatalerror();
-	tty_print("An unknown interrupt has been triggered\n");
+	tty_print("Page Fault\n");
 	
 	hang();
 }
@@ -163,7 +165,7 @@ __attribute__((interrupt)) void isr14(uint8_t* ptrToNothing) {
 __attribute__((interrupt)) void isr15(uint8_t* ptrToNothing) {
 	cli();
 	fatalerror();
-	tty_print("CoProcessor Fault\n");
+	tty_print("An unknown interrupt has been triggered\n");
 	
 	hang();
 }
@@ -171,7 +173,7 @@ __attribute__((interrupt)) void isr15(uint8_t* ptrToNothing) {
 __attribute__((interrupt)) void isr16(uint8_t* ptrToNothing) {
 	cli();
 	fatalerror();
-	tty_print("Unaligned memory operand\n");
+	tty_print("CoProcessor Fault\n");
 	
 	hang();
 }
@@ -179,7 +181,15 @@ __attribute__((interrupt)) void isr16(uint8_t* ptrToNothing) {
 __attribute__((interrupt)) void isr17(uint8_t* ptrToNothing) {
 	cli();
 	fatalerror();
-	tty_print("Warning! A peice of hardware (most likely the CPU) in your system has reported that it is malfunctioning.\n");
+	tty_print("Unaligned memory operand\n");
+	
+	hang();
+}
+
+__attribute__((interrupt)) void isr18(uint8_t* ptrToNothing) {
+	cli();
+	fatalerror();
+	tty_print("Warning! A peice of hardware (most likely the CPU or memory) in your system has reported that it is malfunctioning.\n");
 	hang();
 }
 

@@ -1,6 +1,7 @@
 #include "parallelport.h"
 
 void parallel_busy_wait(uint16_t port) {
+    parallel_port_sanity_check(port);
     // Get busy bit and wait until parallel port is ready
     while(!(inb(port+1) & PARALLEL_STATUS_REG_BUSY)) {
         // LPT is busy
@@ -9,6 +10,7 @@ void parallel_busy_wait(uint16_t port) {
 }
 
 void parallel_outb(uint8_t data, uint16_t port) {
+    parallel_port_sanity_check(port);
     parallel_busy_wait(port);
     // Output data
     outb(port, data);
@@ -23,10 +25,12 @@ void parallel_outb(uint8_t data, uint16_t port) {
 }
 
 void parallel_print(uint16_t port, char* str) {
+    parallel_port_sanity_check(port);
     for(uint32_t i=0;i<strlen(str);i++) parallel_outb(str[i], port);
 }
 
 void parallel_printf(uint16_t port, char* restrict fmt, ...) {
+    parallel_port_sanity_check(port);
     char buf[MAX_PRINTF_OUTPUT_SIZE];
     memset(buf, 0, MAX_PRINTF_OUTPUT_SIZE);
     va_list args;
@@ -34,9 +38,12 @@ void parallel_printf(uint16_t port, char* restrict fmt, ...) {
     int written = vsprintf(buf, fmt, args);
     parallel_print(port, buf);
     va_end(args);
-    return written;
+    return;// written;
 }
 
 void parallel_handle_interrupt(uint16_t port) {
 
+#ifdef DEBUG
+    // Only echo parallel port if debug build
+#endif
 }
