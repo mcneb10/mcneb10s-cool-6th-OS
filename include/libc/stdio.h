@@ -5,7 +5,7 @@
 #include <stdarg.h>
 #include "stdlib.h"
 
-#include "../core/mem.h"
+#include "../drivers/mem.h"
 // TODO: don't let user space processes access kernel functions
 #include "../core/utils.h"
 

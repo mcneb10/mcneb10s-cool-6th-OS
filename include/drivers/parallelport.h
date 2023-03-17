@@ -34,4 +34,6 @@ void parallel_handle_interrupt(uint16_t port);
 
 #define parallel_port_sanity_check(port) if(port != LPT1 && port != LPT2) { wumbo_exit_func("Invalid LPT IO port 0x%hx\n", port); }
 
+#define PARALLEL_BUF_SIZE 1000
+
 #endif

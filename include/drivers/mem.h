@@ -2,7 +2,7 @@
 #define OS6_MEM_H
 
 #include <stddef.h>
-#include "utils.h"
+#include "../core/utils.h"
 
 #define FREESPACE_ENTRY_MAX 40000
 

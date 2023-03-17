@@ -28,8 +28,6 @@ __attribute__((interrupt)) void irq0(uint8_t* ptrToNothing) {
 __attribute__((interrupt)) void irq1(uint8_t* ptrToNothing) {
     cli();
     ps2_handle_interrupt(1);
-    inb(PS2_DATA_PORT);
-    inb(PS2_DATA_PORT);
     masterEOI();
     sti();
 }

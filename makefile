@@ -1,14 +1,11 @@
 .PHONY: do run build clean rebuild
 
-CFLAGS+=-fno-pie -save-temps -nostdlib -ffreestanding -g -m32 -DDebug
+CFLAGS+=-fno-pie -nostdlib -ffreestanding -g -m32 -DDebug
 
 LDFLAGS+=-lgcc -m elf_i386 -T link.ld
 
 CORE=\
-include/core/mem.o\
 include/core/utils.o\
-include/core/serviceInterrupt.o\
-include/core/serviceInterruptHandler.o\
 include/core/wumbo.o
 
 DRIVERS=\
@@ -21,6 +18,9 @@ include/drivers/tty.o\
 include/drivers/cpuid.o\
 include/drivers/ps2.o\
 include/drivers/parallelport.o\
+include/drivers/serviceInterrupt.o\
+include/drivers/serviceInterruptHandler.o\
+include/drivers/mem.o\
 include/drivers/pit.o
 
 CLIB_STUFF_OBJS=\
@@ -66,9 +66,9 @@ include makefile.conf
 
 .SUFFIXES:.o .c .S .asm
 
-redo: rebuild run
-
 do: build run
+
+redo: rebuild run
 
 run:
 	cmd.exe /c qemu.bat
